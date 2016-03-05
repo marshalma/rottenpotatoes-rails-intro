@@ -13,25 +13,34 @@ class MoviesController < ApplicationController
   def index
     @all_ratings = Movie.unique_values(:rating)
     @ratings = @all_ratings
+    @sort = :id
 
+    flag_redirect_1 = false
+    flag_redirect_2 = false
     if params.has_key?(:sort)
       @sort = params[:sort]
+      session[:sort] = @sort
+    elsif session.has_key?(:sort)
+      flag_redirect_1 = true
     end
 
     if params.has_key?(:ratings)
-        @ratings = params[:ratings].keys
+      @ratings = params[:ratings].keys
+      session[:ratings] = @ratings
+    elsif session.has_key?(:ratings)
+      flag_redirect_2 = true
+    end
+
+    if flag_redirect_1 && flag_redirect_2
+      redirect_to movies_path({:sort => session[:sort], :ratings => Hash[session[:ratings].map {|x| [x,1]}]})
+    elsif flag_redirect_1
+      redirect_to movies_path({:sort => session[:sort], :ratings => params[:ratings]})
+    elsif flag_redirect_2
+      redirect_to movies_path({:sort => params[:sort], :ratings => Hash[session[:ratings].map {|x| [x,1]}]})
     end
 
     # logger.debug("ratings:: #{@ratings.inspect}")
-
-    if params[:sort] == 'title'
-      @movies = Movie.where(rating: @ratings).order(:title)
-      return
-    elsif params[:sort] == 'release_date'
-      @movies = Movie.where(rating: @ratings).order(:release_date)
-      return
-    end
-    @movies = Movie.where(rating: @ratings)
+    @movies = Movie.where(rating: @ratings).order(@sort)
   end
 
   def new
