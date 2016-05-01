@@ -1,0 +1,6 @@
+UIN : 324006382
+Name: Shuo Ma
+Git Repo:
+  https://github.com/marshalma/rottenpotatoes-rails-intro
+Heroku app:
+  https://young-bayou-69629.herokuapp.com/
